@@ -1,0 +1,39 @@
+{
+  "name": "jedrzejchalubek/wp-docker-starter",
+  "type": "project",
+  "license": "MIT",
+  "homepage": "https://github.com/jedrzejchalubek/wp-docker-starter",
+  "authors": [
+    {
+      "name": "Jędrzej Chałubek",
+      "email": "jedrzej.chalubek@gmail.com",
+      "homepage": "https://github.com/jedrzejchalubek"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://wpackagist.org"
+    }
+  ],
+  "require": {
+    "php": ">=5.6",
+    "johnpbloch/wordpress": "4.9.8"
+  },
+  "config": {
+    "vendor-dir": "web/vendor"
+  },
+  "extra": {
+    "wordpress-install-dir": "web/wp",
+    "installer-paths": {
+      "web/wp/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+      "web/wp/plugins/{$name}/": ["type:wordpress-plugin"],
+      "web/wp/themes/{$name}/": ["type:wordpress-theme"]
+    }
+  },
+  "scripts": {
+    "post-root-package-install": [
+      "php -r \"copy('.env.example', '.env');\""
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+vendor/
+
+web/*
+!web/wp-config.php
+
+data/*
+!data/.gitkeep
+
+log/*
+!log/.gitkeep
+
+docker-compose.override.yml
+
+.DS_Store
+Thumbs.db
