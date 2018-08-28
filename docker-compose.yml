@@ -4,7 +4,7 @@ services:
   mariadb:
     image: mariadb:10
     volumes:
-      - ./data/db:/var/lib/mysql
+      - ./data/db:/var/lib
     ports:
       - 3306:3306
     environment:
@@ -23,7 +23,7 @@ services:
       - ./web/wp-config.php:/var/www/html/wp-config.php
       - ./config/phpfpm/php.ini:/usr/local/etc/php/php.ini
   nginx:
-    image: nginx:1
+    image: nginx:1.15
     depends_on:
       - phpfpm
     ports:
