@@ -31,6 +31,8 @@
       "web/wp/themes/{$name}/": ["type:wordpress-theme"]
     }
   },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "scripts": {
     "post-create-project-cmd": [
       "php -r \"copy(__DIR__.'/.env.example', __DIR__.'/.env');\"",
