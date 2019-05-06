@@ -7,7 +7,7 @@ vendor/
 
 # Web files in log directory
 web/*
-!web/wp-config.php
+!web/wp-config-sample.php
 
 # Data files from containers
 data/*

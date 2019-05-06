@@ -32,8 +32,9 @@
     }
   },
   "scripts": {
-    "post-root-package-install": [
-      "php -r \"copy('.env.example', '.env');\""
+    "post-create-project-cmd": [
+      "php -r \"copy(__DIR__.'/.env.example', __DIR__.'/.env');\"",
+      "php -r \"copy(__DIR__.'/web/wp-config-sample.php', __DIR__.'/web/wp/wp-config.php');\""
     ]
   }
 }
