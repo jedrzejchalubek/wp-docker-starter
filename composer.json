@@ -35,7 +35,7 @@
   "prefer-stable": true,
   "scripts": {
     "post-create-project-cmd": [
-      "chmod +x bin/create.sh"
+      "php -r \"copy('.env.example', '.env');\""
     ]
   }
 }
