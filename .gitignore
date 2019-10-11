@@ -5,18 +5,6 @@ docker-compose.override.yml
 # Dependencies from package manager
 vendor/
 
-# Web files in log directory
-web/*
-!web/wp-config.php
-
-# Data files from containers
-data/*
-!data/.gitkeep
-
-# Log and debug files
-log/*
-!log/.gitkeep
-
 # Useless temp files
 .DS_Store
 Thumbs.db

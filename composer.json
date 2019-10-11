@@ -17,18 +17,17 @@
     }
   ],
   "require": {
-    "php": ">=5.6",
-    "roots/wordpress": "5.0"
+    "php": ">=7.0",
+    "composer/installers": "^1.4"
   },
-  "config": {
-    "vendor-dir": "web/vendor"
+  "require-dev": {
+
   },
   "extra": {
-    "wordpress-install-dir": "web/wp",
     "installer-paths": {
-      "web/wp/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
-      "web/wp/plugins/{$name}/": ["type:wordpress-plugin"],
-      "web/wp/themes/{$name}/": ["type:wordpress-theme"]
+      "wp-content/mu-plugins/{$name}/": ["type:wordpress-muplugin"],
+      "wp-content/plugins/{$name}/": ["type:wordpress-plugin"],
+      "wp-content/themes/{$name}/": ["type:wordpress-theme"]
     }
   },
   "minimum-stability": "dev",

@@ -1,0 +1,112 @@
+# ======================================================================
+# Required environment variables
+# ======================================================================
+#
+# Repository name on Gitlab. You can find this on your Gitlab repo page, under "Registry"
+# GITLAB_REPOSITORY_NAME: jedrzejchalubek/wordpress-docker-starter
+#
+# Name of the application testing env on Heroku
+# HEROKU_APP_NAME_DEVELOP: wordpress-docker-starter-develop
+#
+# Url of the application testing env on Heroku
+# HEROKU_APP_URL_DEVELOP: http://wordpress-docker-starter-develop.herokuapp.com
+#
+# Name of the application staging env on Heroku
+# HEROKU_APP_NAME_STAGING: wordpress-docker-starter-staging
+#
+# Url of the application staging env on Heroku
+# HEROKU_APP_URL_STAGING: http://wordpress-docker-starter-staging.herokuapp.com
+#
+# Name of the application production env on Heroku
+# HEROKU_APP_NAME_PRODUCTION: wordpress-docker-starter-production
+#
+# Url of the application staging env on Heroku
+# HEROKU_APP_URL_PRODUCTION: http://wordpress-docker-starter-production.herokuapp.com
+#
+# Heroku username for login
+# HEROKU_USER: email@example.com
+#
+# Can be found on: https://dashboard.heroku.com/account under "API Key" section
+# HEROKU_API_KEY: <API KEY>
+#
+# Private key allowed to access repository. Repository have to have a public key added
+# SSH_PRIVATE_KEY: <CONTENT SSH KEY>
+
+image: docker:18.09.7-git
+
+services:
+  - docker:18.09.7-dind
+
+variables:
+  DOCKER_DRIVER: overlay
+  DOCKER_HOST: tcp://docker:2375/
+
+stages:
+  - build
+  - deploy
+
+before_script:
+  - echo -n $CI_BUILD_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
+
+build_image:
+  stage: build
+  script:
+    - docker build -t registry.gitlab.com/$GITLAB_REPOSITORY_NAME:$CI_COMMIT_REF_SLUG .
+      --build-arg SSH_PRIVATE_KEY
+      --build-arg WORDPRESS_ENV
+      --build-arg ACF_PRO_KEY
+    - docker push registry.gitlab.com/$GITLAB_REPOSITORY_NAME:$CI_COMMIT_REF_SLUG
+
+deploy_develop:
+  stage: deploy
+  environment:
+    name: develop
+    url: $HEROKU_APP_URL_DEVELOP
+  services:
+    - docker:18.09.7-dind
+  script:
+    - echo -n $HEROKU_API_KEY | docker login --username=$HEROKU_USER --password-stdin registry.heroku.com
+    - docker pull registry.gitlab.com/$GITLAB_REPOSITORY_NAME:$CI_COMMIT_REF_SLUG
+    - docker tag registry.gitlab.com/$GITLAB_REPOSITORY_NAME:$CI_COMMIT_REF_SLUG registry.heroku.com/$HEROKU_APP_NAME_DEVELOP/web:$CI_COMMIT_REF_SLUG
+    - docker push registry.heroku.com/$HEROKU_APP_NAME_DEVELOP/web:$CI_COMMIT_REF_SLUG
+  after_script:
+    - apk add --update --update-cache --upgrade curl && rm -rf /var/cache/apk/*
+    - chmod +x ./bin/release.sh && ./bin/release.sh $HEROKU_APP_NAME_DEVELOP registry.heroku.com/$HEROKU_APP_NAME_DEVELOP/web:$CI_COMMIT_REF_SLUG
+  only:
+    - develop
+
+deploy_staging:
+  stage: deploy
+  environment:
+    name: staging
+    url: $HEROKU_APP_URL_STAGING
+  services:
+    - docker:18.09.7-dind
+  script:
+    - echo -n $HEROKU_API_KEY | docker login --username=$HEROKU_USER --password-stdin registry.heroku.com
+    - docker pull registry.gitlab.com/$GITLAB_REPOSITORY_NAME:$CI_COMMIT_REF_SLUG
+    - docker tag registry.gitlab.com/$GITLAB_REPOSITORY_NAME:$CI_COMMIT_REF_SLUG registry.heroku.com/$HEROKU_APP_NAME_STAGING/web:$CI_COMMIT_REF_SLUG
+    - docker push registry.heroku.com/$HEROKU_APP_NAME_STAGING/web:$CI_COMMIT_REF_SLUG
+  after_script:
+    - apk add --update --update-cache --upgrade curl && rm -rf /var/cache/apk/*
+    - chmod +x ./bin/release.sh && ./bin/release.sh $HEROKU_APP_NAME_STAGING registry.heroku.com/$HEROKU_APP_NAME_STAGING/web:$CI_COMMIT_REF_SLUG
+  only:
+    - master
+
+deploy_production:
+  stage: deploy
+  environment:
+    name: production
+    url: $HEROKU_APP_URL_PRODUCTION
+  services:
+    - docker:18.09.7-dind
+  script:
+    - echo -n $HEROKU_API_KEY | docker login --username=$HEROKU_USER --password-stdin registry.heroku.com
+    - docker pull registry.gitlab.com/$GITLAB_REPOSITORY_NAME:$CI_COMMIT_REF_SLUG
+    - docker tag registry.gitlab.com/$GITLAB_REPOSITORY_NAME:$CI_COMMIT_REF_SLUG registry.heroku.com/$HEROKU_APP_NAME_PRODUCTION/web:$CI_COMMIT_REF_SLUG
+    - docker push registry.heroku.com/$HEROKU_APP_NAME_PRODUCTION/web:$CI_COMMIT_REF_SLUG
+  after_script:
+    - apk add --update --update-cache --upgrade curl && rm -rf /var/cache/apk/*
+    - chmod +x ./bin/release.sh && ./bin/release.sh $HEROKU_APP_NAME_PRODUCTION registry.heroku.com/$HEROKU_APP_NAME_PRODUCTION/web:$CI_COMMIT_REF_SLUG
+  only:
+    - tags
